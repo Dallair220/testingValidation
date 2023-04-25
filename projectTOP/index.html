@@ -7,33 +7,32 @@
     <title>Document</title>
     <style>
       body {
-        background-color: #fff;
-        color: #333;
         font: 1em / 1.4 'Helvetica Neue', Helvetica, Arial, sans-serif;
         padding: 1em;
         margin: 0;
       }
 
-      * {
-        box-sizing: border-box;
-      }
-
-      form label {
+      label {
         display: block;
         margin-bottom: 10px;
       }
 
-      form label span {
+      span {
         display: inline-block;
         width: 120px;
+      }
+
+      input:invalid {
+        border-color: #900;
+        background-color: #fdd;
       }
     </style>
   </head>
   <body>
-    <form>
+    <form novalidate>
       <label for="mail">
         <span>Mail:</span>
-        <input type="email" id="mail" name="mail" />
+        <input type="input" id="mail" name="mail" />
       </label>
       <label for="country">
         <span>Country:</span>
@@ -47,30 +46,49 @@
         <span>Password:</span>
         <input type="password" id="pass" name="pass" />
       </label>
-      <label for="passconfirm">
-        <span>Pass Confirm:</span>
-        <input type="password" id="passconfirm" name="passconfirm" />
+      <label for="confirmpass">
+        <span>Confirm pass:</span>
+        <input type="password" id="confirmpass" name="confirmpass" />
       </label>
       <button>Submit</button>
     </form>
 
     <script defer>
-      //   const email = document.getElementById('mail');
+      // add an event listener to each input field, fires when a user tabs out a field
+      document.querySelectorAll('input').forEach((input) => {
+        input.addEventListener('blur', customCheckValidity);
+      });
 
-      //   email.addEventListener('input', (event) => {
-      //     if (email.validity.typeMismatch) {
-      //       email.setCustomValidity('Enter an Email!');
-      //       return;
-      //     } else {
-      //       email.setCustomValidity('');
-      //     }
+      // listens to submit button
+      document.querySelector('form').addEventListener('submit', (event) => {
+        // checks each field for validity - throws live error to user
+        document.querySelectorAll('input').forEach((input) => {
+          const eventFake = { target: input };
+          customCheckValidity(eventFake);
+        });
+        // prevents sending the form if there are invalid fields.
+        const invalidInputs = document.querySelectorAll('input:invalid');
+        if (invalidInputs.length > 0) {
+          event.preventDefault();
+        } else {
+          alert('Form successfully submitted 🙌');
+        }
+      });
 
-      //     if (!email.validity.valid) {
-      //       email.setCustomValidity('At least 10 chars long!');
-      //     } else {
-      //       email.setCustomValidity('');
-      //     }
-      //   });
+      // check if input is valid
+      function customCheckValidity(event) {
+        const input = event.target;
+
+        if (input.value.length < 4) {
+          input.setCustomValidity(
+            `Please enter at least 4 chars. You entered only ${input.value.length}.`
+          );
+        } else {
+          input.setCustomValidity('');
+        }
+
+        input.reportValidity();
+      }
     </script>
   </body>
 </html>
